@@ -1,0 +1,16 @@
+.vscode/c_cpp_properties.json
+extract.exe
+main.exe
+rank.exe
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+data/image_0072.jpg
+data/image_0073.jpg
+data/image_0074.jpg
+data/image_0075.jpg
+data/image_0080.jpg
+data/image_0081.jpg
+data/image_0082.jpg
+data/image_0083.jpg
+data/pyramid.jpg
