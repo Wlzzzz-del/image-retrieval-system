@@ -101,6 +101,8 @@ public:
     matcher(DescriptorMatcher::create("BruteForce")),
     bowde(new BOWImgDescriptorExtractor(detector, matcher))
     {}
+protected:
+    Base_Extract(){}
     
 
 private:
@@ -125,7 +127,7 @@ public:
 //  extract the keypoints of files
 //  return: void 
 //-------------------------------------------------------------------
-    void _extract()
+    virtual void _extract()
     {
         BOWTrainer trainer(cluster_num);
         
@@ -151,7 +153,7 @@ public:
 //  compute a graph in BOWImgDescriptorExtractor and normalize
 //  return: void 
 //-------------------------------------------------------------------
-    _Feature get_one(_Path path)
+    virtual _Feature get_one(_Path path)
     {
         _Feature img = imread(path);
         _Feature output;
