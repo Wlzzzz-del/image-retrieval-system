@@ -8,7 +8,7 @@ import sys
 import ft
 from keras.applications.vgg16 import VGG16
 from keras.applications.vgg19 import VGG19
-
+import cv2 as cv
 import os
 import scipy.io as io
 import math
@@ -67,10 +67,11 @@ class WidegtGallery(QDialog):
         self.sear_img = MyQLabel()
         self.sear_img.setStyleSheet("border:1px solid gray")
 
-        self.combobutton.addItems(["基于语义(VGG16)","基于内容(SIFT)"])
+        self.combobutton.addItems(["基于语义(VGG16)","基于内容(SIFT)","基于语义(VGG19)"])
         self.combobutton.setToolTip("选择使用的算法")
         self.combobutton.setItemData(0,"一种基于语义的检索方法，\n以图像的含义为检测标准，\n速度较快且准确率较高",Qt.ToolTipRole)
         self.combobutton.setItemData(1,"一种基于内容的检索方法，\n以物体形状为检测标准，\n速度最快但牺牲部分准确率",Qt.ToolTipRole)
+        self.combobutton.setItemData(2,"一种基于语义的检索方法，\n以图像的含义为检测标准，\n速度较快且准确率较高",Qt.ToolTipRole)
         # 固定相框大小
         self.sear_img.setMaximumSize(300,300)
         self.sear_img.setMinimumSize(300,300)
@@ -102,12 +103,26 @@ class WidegtGallery(QDialog):
             检索事件
         """
         if(self.combobutton.currentText()=="基于语义(VGG16)"):
-            mat = io.loadmat("VGG16_LIB.mat")
+            mat = io.loadmat("./LIB/VGG16_LIB.mat")
             conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
-        elif(self.combobutton.currentText()=="基于内容(SIFT)"):
-            mat = io.loadmat("VGG19_LIB.mat")
+            feature1 = ft.extract_feature(conv_base,self.imgpath.text())
+
+        elif(self.combobutton.currentText()=="基于语义(VGG19)"):
+            mat = io.loadmat("./LIB/VGG19_LIB.mat")
             conv_base = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
-        feature1 = ft.extract_feature(conv_base,self.imgpath.text())
+            feature1 = ft.extract_feature(conv_base,self.imgpath.text())
+
+        elif(self.combobutton.currentText()=="基于内容(SIFT)"):
+            mat = io.loadmat("SIFT_LIB.mat")
+            voc = np.loadtxt("./LIB/siftBOW.npy",dtype='float32')
+            sift = cv.SIFT_create()
+            detector = cv.DescriptorMatcher_create("BruteForce")
+            img = cv.imread(self.imgpath.text())
+            bowde = cv.BOWImgDescriptorExtractor(sift, detector)
+            bowde.setVocabulary(voc)
+            des = sift.detect(img)
+            feature1 = bowde.compute(img,des)
+
         dis_dict = dict()
 
         for i in mat:
@@ -225,19 +240,45 @@ class WidegtGallery(QDialog):
         """
 
         dir = self.libpath.text()
+        sift = cv.SIFT_create()
+        detector = cv.DescriptorMatcher_create("BruteForce")
+
         conv_base16 = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
         conv_base19 = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
         
         feature_dic = dict()
         feature_dic19 = dict()
+        s_dic = dict()
 
         self.ini_bar.setMinimum(0)
+        # 构建词袋模型
         for dirname,_,filesname in os.walk(dir):
             all = len(filesname)
-            num = 0
-            self.ini_bar.setMaximum(all)
+            self.ini_bar.setMaximum(2*all)
+            num=0
             for i in filesname:
                 path = dir+'/'+i
+                img = cv.imread(path)
+                kp = sift.detect(img, None)
+                kp,des = sift.compute(img, kp)
+                bow = cv.BOWKMeansTrainer(20)
+                bow.add(des)
+                siftdic = bow.cluster()
+                num+=1
+                self.ini_bar.setValue(num)
+        np.savetxt("./LIB/siftBOW.npy",siftdic)
+        bowde = cv.BOWImgDescriptorExtractor(sift,detector)
+        bowde.setVocabulary(siftdic)
+
+        for dirname,_,filesname in os.walk(dir):
+            for i in filesname:
+                path = dir+'/'+i
+
+                img = cv.imread(path)
+                des = sift.detect(img)
+                val = bowde.compute(img,des)
+                s_dic[path]=val
+
                 feature = ft.extract_feature(conv_base16,path)
                 feature_dic[path]=feature
 
@@ -245,8 +286,10 @@ class WidegtGallery(QDialog):
                 feature_dic19[path]=feature
                 num+=1
                 self.ini_bar.setValue(num)
-        io.savemat("VGG16_LIB",feature_dic)
-        io.savemat("VGG19_LIB",feature_dic19)
+
+        io.savemat("./LIB/VGG16_LIB",feature_dic)
+        io.savemat("./LIB/VGG19_LIB",feature_dic19)
+        io.savemat("./LIB/SIFT_LIB",s_dic)
 
         pass
 
