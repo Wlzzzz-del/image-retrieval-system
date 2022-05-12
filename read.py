@@ -12,7 +12,7 @@ import os
 conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
 
 mat = io.loadmat("a.mat")
-feature1 = ft.extract_feature(conv_base,"ant/barrel_2.jpg")
+feature1 = ft.extract_feature(conv_base,"./data/train/train/ant/image_0001.jpg")
 #feature2 = ft.extract_feature(conv_base,"ant/barrel_2.jpg")
 dis_dict = dict()
 

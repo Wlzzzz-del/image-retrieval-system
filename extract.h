@@ -158,9 +158,9 @@ public:
         _Feature img = imread(path);
         _Feature output;
         _Point_List KeyPoints;
-        detector->detect(img,KeyPoints);
-        bowde->compute(img, KeyPoints, output);
-        normalize(output, output, 1.0, 0.0 ,NORM_MINMAX);// normalize vectors into 0~1
+        detector->detect(img,KeyPoints);// 检测SIFT关键点
+        bowde->compute(img, KeyPoints, output);// 计算特征向量
+        normalize(output, output, 1.0, 0.0 ,NORM_MINMAX);// 特征向量标准化
         return output;
     }
 

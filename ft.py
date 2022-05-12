@@ -3,16 +3,17 @@ from cv2 import imread
 import numpy as np
 import tensorflow as tf
 from keras.applications.vgg16 import VGG16
+from keras.applications.vgg19 import VGG19
 import cv2
 #实例化一个VGG16卷积基
 #输入维度根据需要自行指定，这里仍然采用上一个例子的维度，卷积基的输出是(None,4,4,512)
 ###############单纯用VGG16卷积基直接提取特征，不使用图像增强####################
 import os
-from keras.preprocessing.image import ImageDataGenerator
 
 # 图像迭代器
 # 定义VGG16模型
 def extract_feature(extractor, file):
+    size=(150,150)
     img = cv2.imread(file)
     img = cv2.resize(img, size,img)
 
@@ -25,15 +26,34 @@ def extract_feature(extractor, file):
     feature= np.reshape(feature,(4*4*512))
     return feature
 
-conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
-size = (150,150)
-dir = "./ant"
-feature_dic = dict()
 
-for dirname,_,filesname in os.walk(dir):
-    for i in filesname:
-        path = dir+'/'+i
-        feature = extract_feature(conv_base,path)
-        feature_dic[path]=feature
+def ini_lib16(dir):
+    """
+        利用VGG16提取特征
+    """
+    conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
+    feature_dic = dict()
 
-io.savemat("a",feature_dic)
+    for dirname,_,filesname in os.walk(dir):
+        for i in filesname:
+            path = dir+'/'+i
+            feature = extract_feature(conv_base,path)
+            print("VGG16 is featuring "+path)
+            feature_dic[path]=feature
+    print("Done")
+    io.savemat("VGG16_LIB",feature_dic)
+
+def ini_lib19(dir):
+    """
+        利用VGG19提取特征
+    """
+    conv_base = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
+    feature_dic = dict()
+
+    for dirname,_,filesname in os.walk(dir):
+        for i in filesname:
+            path = dir+'/'+i
+            feature = extract_feature(conv_base,path)
+            print("VGG19 is featuring "+path)
+            feature_dic[path]=feature
+    io.savemat("VGG19_LIB",feature_dic)
