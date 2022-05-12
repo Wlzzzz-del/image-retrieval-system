@@ -304,3 +304,16 @@ data/image_0078.jpg
 data/image_0079.jpg
 data/image_0084.jpg
 data/image_0085.jpg
+test/chair.jpg
+test/dolphin.jpg
+test/plane.jpg
+test/umbrella.jpg
+test/watch.jpg
+a.mat
+wall.png
+.gitignore
+miluve.py
+main.cpp
+__pycache__/ft.cpython-36.pyc
+main.cpp
+.gitignore
