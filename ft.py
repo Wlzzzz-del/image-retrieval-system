@@ -23,7 +23,7 @@ def extract_feature(extractor, file):
 
     # 提取特征并降维
     feature = extractor.predict(np_img_data)
-    feature= np.reshape(feature,(4*4*512))
+    feature= np.reshape(feature,(512))
     return feature
 
 

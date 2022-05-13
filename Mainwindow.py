@@ -104,16 +104,16 @@ class WidegtGallery(QDialog):
         """
         if(self.combobutton.currentText()=="基于语义(VGG16)"):
             mat = io.loadmat("./LIB/VGG16_LIB.mat")
-            conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
+            conv_base = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3),pooling='avg')
             feature1 = ft.extract_feature(conv_base,self.imgpath.text())
 
         elif(self.combobutton.currentText()=="基于语义(VGG19)"):
             mat = io.loadmat("./LIB/VGG19_LIB.mat")
-            conv_base = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
+            conv_base = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3),pooling='avg') 
             feature1 = ft.extract_feature(conv_base,self.imgpath.text())
 
         elif(self.combobutton.currentText()=="基于内容(SIFT)"):
-            mat = io.loadmat("SIFT_LIB.mat")
+            mat = io.loadmat("./LIB/SIFT_LIB.mat")
             voc = np.loadtxt("./LIB/siftBOW.npy",dtype='float32')
             sift = cv.SIFT_create()
             detector = cv.DescriptorMatcher_create("BruteForce")
@@ -243,8 +243,8 @@ class WidegtGallery(QDialog):
         sift = cv.SIFT_create()
         detector = cv.DescriptorMatcher_create("BruteForce")
 
-        conv_base16 = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
-        conv_base19 = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3)) 
+        conv_base16 = VGG16(weights="imagenet",include_top=False, input_shape=(150,150,3),pooling='avg') 
+        conv_base19 = VGG19(weights="imagenet",include_top=False, input_shape=(150,150,3),pooling='avg') 
         
         feature_dic = dict()
         feature_dic19 = dict()
